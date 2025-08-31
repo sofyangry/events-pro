@@ -1,0 +1,11 @@
+<!-- @format -->
+
+<% if (locals.errors) {%> <% errors.forEach((err) => {%>
+<div
+	class="alert alert-danger"
+	style="margin-left: -150px; margin-right: 150px">
+	<%= err.msg %>
+</div>
+<% }) %> <% } %> <% if (locals.message && message !="") { %>
+<div class="alert alert-success"><%= message %></div>
+<% } %>
