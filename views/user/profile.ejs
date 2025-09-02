@@ -3,15 +3,33 @@
 -%>
 <div class="container">
 	<div class="row mt-4">
-		<div class="col-md-9 offset-md-3">
-			<h1
-				class="display-4"
-				style="margin-left: -150px; margin-right: 150px">
-				Profile
-			</h1>
+		<div class="col-md-3">
+			<img
+				src="/images/download.png"
+				alt="" />
+		</div>
+		<div class="col-md-9">
+			<h1 class="display-4">Profile</h1>
+
+			<hr />
 			<%- include("../partials/flash.ejs") -%>
 
-			<hr style="margin-left: -150px; margin-right: 150px" />
+			<p><% if (user) { %> Welcome .. your email <%= user.email %> <% } %></p>
+
+			<form
+				action="/users/uploadAvatar"
+				method="post"
+				enctype="multipart/form-data">
+				<input
+					type="file"
+					name="avatar"
+					id="avatar" />
+				<button
+					type="submit"
+					class="btn btn-primary">
+					Upload
+				</button>
+			</form>
 		</div>
 	</div>
 </div>

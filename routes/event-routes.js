@@ -6,28 +6,59 @@ const Event = require('../models/Event');
 const { check, validationResult } = require('express-validator');
 const moment = require('moment');
 moment().format();
+
+//middleware to check if user is logged in
+
+isAuthenticated = (req, res, next) => {
+	if (req.isAuthenticated()) return next();
+	res.redirect('/users/login');
+};
+
+//Creat New Event
+router.get('/create', isAuthenticated, (req, res) => {
+	res.render('event/create', {
+		errors: req.flash('errors'),
+	});
+});
+
 // route to home event
-router.get('/', async (req, res) => {
+router.get('/:pageNo?', async (req, res) => {
+	let pageNo = 1;
+
+	if (req.params.pageNo) {
+		pageNo = parseInt(req.params.pageNo);
+	}
+	if (req.params.pageNo == 0) {
+		pageNo = 1;
+	}
+
+	let q = {
+		skip: 5 * (pageNo - 1),
+		limit: 5,
+	};
+
+	// find total
+	let totalDocs = 0;
+
 	try {
-		const events = await Event.find({});
-		// res.json(events);
+		totalDocs = await Event.countDocuments({});
+		const events = await Event.find({}, {}, q);
+
 		let chunk = [];
 		let chunkSize = 3;
 		for (let i = 0; i < events.length; i += chunkSize) {
 			chunk.push(events.slice(i, chunkSize + i));
 		}
-		// res.json(chunk);
-		res.render('event/index', { chunk: chunk, message: req.flash('info') });
+
+		res.render('event/index', {
+			chunk: chunk,
+			message: req.flash('info'),
+			total: parseInt(totalDocs),
+			pageNo: pageNo,
+		});
 	} catch (err) {
 		res.status(500).send(err);
 	}
-});
-
-//Creat New Event
-router.get('/create', (req, res) => {
-	res.render('event/create', {
-		errors: req.flash('errors'),
-	});
 });
 
 //Save Event To db
@@ -57,6 +88,7 @@ router.post(
 					description: req.body.description,
 					date: req.body.date,
 					location: req.body.location,
+					user_id: req.user.id,
 					created_at: Date.now(),
 				});
 
@@ -73,7 +105,7 @@ router.post(
 );
 
 // show single event
-router.get('/:id', async (req, res) => {
+router.get('/show/:id', async (req, res) => {
 	try {
 		const event = await Event.findById(req.params.id);
 		if (!event) {
@@ -86,7 +118,7 @@ router.get('/:id', async (req, res) => {
 	}
 });
 //edit route
-router.get('/edit/:id', async (req, res) => {
+router.get('/edit/:id', isAuthenticated, async (req, res) => {
 	try {
 		const event = await Event.findById(req.params.id);
 		if (!event) {
@@ -118,6 +150,7 @@ router.post(
 			.withMessage('Location Should Be More Than 3 Char'),
 		check('date').isLength({ min: 5 }).withMessage('Date Should Valid Date'),
 	],
+	isAuthenticated,
 	async (req, res) => {
 		const errors = validationResult(req);
 		if (!errors.isEmpty()) {
@@ -145,8 +178,7 @@ router.post(
 );
 
 //delete event
-// event-routes.js
-router.delete('/delete/:id', async (req, res) => {
+router.delete('/delete/:id', isAuthenticated, async (req, res) => {
 	try {
 		const result = await Event.deleteOne({ _id: req.params.id });
 

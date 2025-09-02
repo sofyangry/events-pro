@@ -39,6 +39,7 @@
 				</li>
 			</ul>
 			<ul class="navbar-nav ms-auto">
+				<% if(!user) { %>
 				<li class="nav-item">
 					<a
 						class="nav-link active"
@@ -55,6 +56,16 @@
 						>Signup</a
 					>
 				</li>
+				<% } else { %>
+				<li class="nav-item">
+					<a
+						class="nav-link active"
+						aria-current="page"
+						href="/users/logout"
+						>Logout</a
+					>
+				</li>
+				<% } %>
 			</ul>
 		</div>
 	</div>

@@ -4,16 +4,29 @@ const router = express.Router();
 const User = require('../models/User');
 const passport = require('passport');
 
+//middleware to check if user is logged in
+
+isAuthenticated = (req, res, next) => {
+	if (req.isAuthenticated()) return next();
+	res.redirect('/users/login');
+};
+
 //  login user view
 router.get('/login', (req, res) => {
-	res.render('user/login');
+	res.render('user/login', {
+		error: req.flash('error'),
+	});
 });
 
 // login post request
-router.post('/login', (req, res) => {
-	console.log(req.body);
-	res.json('login in user ... ');
-});
+router.post(
+	'/login',
+	passport.authenticate('local.login', {
+		successRedirect: '/users/profile',
+		failureRedirect: '/users/login',
+		failureFlash: true,
+	})
+);
 
 // sign up form
 router.get('/signup', (req, res) => {
@@ -34,7 +47,7 @@ router.post(
 );
 
 // progile
-router.get('/profile', (req, res) => {
+router.get('/profile', isAuthenticated, (req, res) => {
 	res.render('user/profile', {
 		success: req.flash('success'),
 	});
@@ -43,7 +56,12 @@ router.get('/profile', (req, res) => {
 // logout user
 
 router.get('/logout', (req, res) => {
-	res.json('logout user');
+	req.logout(function (err) {
+		if (err) {
+			return next(err);
+		}
+		res.redirect('/users/login');
+	});
 });
 
 module.exports = router;

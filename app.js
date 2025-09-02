@@ -5,7 +5,8 @@ const connectDB = require('./config/database');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const flash = require('connect-flash');
-
+const passport = require('passport');
+const passportSetup = require('./config/passport-setup.js');
 connectDB();
 
 app.set('view engine', 'ejs');
@@ -15,6 +16,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.use(express.static('public'));
+app.use(express.static('uploads'));
 app.use(express.static('node_modules'));
 
 //Session and Flash Config
@@ -27,6 +29,17 @@ app.use(
 	})
 );
 app.use(flash());
+//bring passport
+app.use(passport.initialize());
+app.use(passport.session());
+
+//store user object
+
+app.use((req, res, next) => {
+	res.locals.user = req.user || null;
+	next();
+});
+
 app.get('/', (req, res) => {
 	res.redirect('/events');
 });

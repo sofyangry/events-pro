@@ -18,6 +18,10 @@ const eventSchema = new mongoose.Schema({
 		type: Date,
 		required: true,
 	},
+	user_id: {
+		type: String,
+		required: true,
+	},
 	created_at: {
 		type: Date,
 		required: true,
