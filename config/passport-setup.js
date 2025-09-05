@@ -49,6 +49,7 @@ passport.use(
 				let newUser = new User();
 				newUser.email = req.body.email;
 				newUser.password = newUser.hashPassword(req.body.password);
+				newUser.avatar = 'profile.png';
 
 				const savedUser = await newUser.save();
 				return done(null, savedUser, req.flash('success', 'User Added'));

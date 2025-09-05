@@ -2,6 +2,7 @@
 
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt-nodejs');
+const { type } = require('jquery');
 
 const userSchema = new mongoose.Schema({
 	email: {
@@ -11,6 +12,10 @@ const userSchema = new mongoose.Schema({
 	password: {
 		type: String,
 		required: true,
+	},
+	avatar: {
+		type: String,
+		require: true,
 	},
 });
 
